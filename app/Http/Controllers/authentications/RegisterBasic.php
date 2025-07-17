@@ -27,6 +27,6 @@ class RegisterBasic extends Controller
       'password' => $request->password, // Laravel vai hashear automaticamente
     ]);
 
-    return redirect()->route('auth-login-basic')->with('success', 'Usuário registrado com sucesso!');
+    return redirect()->route('login')->with('success', 'Usuário registrado com sucesso!');
   }
 }
