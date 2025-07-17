@@ -23,7 +23,7 @@ class LoginBasic extends Controller
     if (Auth::attempt($credentials)) {
       $request->session()->regenerate();
 
-      return redirect()->intended('/auth/forgot-password-basic');
+      return redirect()->intended('/dashboard');
     }
 
     return back()->withErrors([
