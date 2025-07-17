@@ -1,41 +1,43 @@
-### Etapa 1: Build do frontend com Vite
-FROM node:18 AS node-builder
+# --- Estágio 1: Build do frontend com Yarn ---
+FROM node:18-alpine AS frontend_builder
+WORKDIR /app    
 
-WORKDIR /app
-COPY . .
-
-RUN npm install && npm run build
-
-
-### Etapa 2: Backend Laravel com PHP
-FROM php:8.2-fpm
-
-WORKDIR /var/www
-
-# Instala dependências necessárias (sem sqlite)
-RUN apt-get update && apt-get install -y \
-    zip unzip curl git libxml2-dev libzip-dev libpng-dev libjpeg-dev libonig-dev \
-    libpq-dev libjpeg-dev libpng-dev libzip-dev
-
-# Extensões do PHP
-RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
-
-# Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copia os arquivos da aplicação
-COPY . /var/www
-COPY --chown=www-data:www-data . /var/www
-
-# Copia os assets compilados do frontend
-COPY --from=node-builder /app/public/build /var/www/public/build
-
-# Instala dependências PHP
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Gera a APP_KEY (somente se ainda não for fornecida pelo ambiente)
-RUN php artisan key:generate || true
-
-EXPOSE 8000
+# Copia os arquivos de manifesto para aproveitar o cache
+    COPY package.json yarn.lock ./
+    
+    # Instala as dependências do frontend
+    RUN yarn install
+    
+    # Copia o restante dos arquivos
+    COPY . .
+    
+    # Compila os assets para produção
+    RUN yarn build
+    
+    # --- Estágio 2: Aplicação Laravel ---
+    FROM php:8.2-fpm
+    WORKDIR /var/www
+    
+    # Instala dependências do sistema e do PHP
+    RUN apt-get update && apt-get install -y \
+        git zip unzip curl \
+        libpq-dev libpng-dev libjpeg-dev libonig-dev libxml2-dev libzip-dev \
+        && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
+    
+    # Instala o Composer
+    COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+    
+    # Copia e instala as dependências do Composer
+    COPY composer.json composer.lock ./
+    RUN composer install --no-dev --no-interaction --optimize-autoloader
+    
+    # Copia o código completo da aplicação
+    COPY . .
+    
+    # Copia os assets compilados do estágio anterior
+    COPY --from=frontend_builder /app/public/build ./public/build
+    
+    # Expõe a porta que o 'artisan serve' vai usar
+    EXPOSE 8000
 
 CMD sh -c "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
