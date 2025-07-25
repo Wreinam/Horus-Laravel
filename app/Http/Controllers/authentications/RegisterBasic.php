@@ -4,7 +4,7 @@ namespace App\Http\Controllers\authentications;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Services\UserService; // 1. Importe o seu novo Service
 
 class RegisterBasic extends Controller
 {
@@ -13,19 +13,15 @@ class RegisterBasic extends Controller
     return view('content.authentications.auth-register-basic');
   }
 
-  public function store(Request $request)
+  public function store(Request $request, UserService $userService)
   {
-    $request->validate([
+    $validatedData = $request->validate([
       'name'     => 'required|string|max:255',
       'email'    => 'required|email|unique:users,email',
-      'password' => 'required|string|min:6|confirmed', // precisa do campo password_confirmation
+      'password' => 'required|string|min:6|confirmed',
     ]);
 
-    User::create([
-      'name'     => $request->name,
-      'email'    => $request->email,
-      'password' => $request->password, // Laravel vai hashear automaticamente
-    ]);
+    $userService->createUser($validatedData);
 
     return redirect()->route('login')->with('success', 'Usuário registrado com sucesso!');
   }
