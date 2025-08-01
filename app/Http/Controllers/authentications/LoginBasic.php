@@ -13,6 +13,13 @@ class LoginBasic extends Controller
     return view('content.authentications.auth-login-basic');
   }
 
+  public function logout(Request $request)
+  {
+    Auth::guard()->logout();
+    $request->session()->invalidate();
+    return redirect('/');
+  }
+
   public function login(Request $request)
   {
     $credentials = $request->validate([

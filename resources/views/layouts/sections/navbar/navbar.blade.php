@@ -19,7 +19,7 @@ $navbarDetached = ($navbarDetached ?? '');
       <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
         <a href="{{url('/')}}" class="app-brand-link gap-2">
           <span class="app-brand-logo demo">@include('_partials.macros',["width"=>25,"withbg"=>'var(--bs-primary)'])</span>
-          <span class="app-brand-text demo menu-text fw-bold text-heading">{{config('variables.templateName')}}</span>
+          <span class="app-brand-text demo menu-text fw-bold text-heading">{{config('variables.projectName')}}</span>
         </a>
       </div>
       @endif
@@ -97,7 +97,7 @@ $navbarDetached = ($navbarDetached ?? '');
                 <div class="dropdown-divider my-1"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="javascript:void(0);">
+                <a class="dropdown-item" href="/logout">
                   <i class="bx bx-power-off bx-md me-3"></i><span>Log Out</span>
                 </a>
               </li>
