@@ -14,14 +14,12 @@
         {
           "url": "/criar-perfil",
           "name": "Criar perfil",
-          "slug": "create-profile",
-          "target": "_blank"
+          "slug": "create-profile"
         },
         {
           "url": "/relatorios",
           "name": "Relatorios",
-          "slug": "reports",
-          "target": "_blank"
+          "slug": "reports"
         }
       ]
     }

@@ -5,11 +5,13 @@ use App\Http\Controllers\dashboard\Analytics;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\authentications\ForgotPasswordBasic;
-use App\Http\Controllers\tables\Basic as TablesBasic;
+use App\Http\Controllers\dashboard\CreateProfile;
+
 
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
+    Route::get('/criar-perfil', [CreateProfile::class, 'index'])->name('create-profile');
 });
 
 // Authentication Page Route
